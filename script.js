@@ -2,7 +2,7 @@
 // ==UserScript==
 // @name         Etherscan CK Extension
 // @namespace    https://github.com/wishhhmaster/EtherscanCKExtension
-// @version      0.2
+// @version      0.3
 // @description  Adds visual info about transactions
 // @author       Wishhhmaster
 // @match        *.etherscan.io/*
@@ -15,12 +15,14 @@ let styles = `<style>
 .summaryCatImg{width: 55px;}
 .father{ border: solid 1px royalblue;}
 td.extraInfo {width: 200px;}
+.usdPrice{ font-size: 10px;}
 
 </style>`;
 
 const CKProfileBaseUrl = "https://www.cryptokitties.co/kitty/";
 const CKGetKittyUrl = "https://api.cryptokitties.co/kitties/";
 
+let ethUSDPrice = 0;
 /**
  * Constants method names
  */
@@ -253,7 +255,7 @@ class HtmlHelper {
    * with the data collected by going into the transaction's details
    * @param table
    */
-  addDetailsToTable(table)
+  addDetailsToTable(table, hasTxFee)
   {
     table.find("tr").each((idx, elt) =>
       {
@@ -264,7 +266,7 @@ class HtmlHelper {
         {
           if (!th.hasClass("extraInfo"))
           {
-            $("<th>Extra</th>").insertBefore(th);
+            $("<th class='extraInfo'>Extra</th>").insertBefore(th);
           }
           return;
         }
@@ -281,6 +283,21 @@ class HtmlHelper {
           savedData = JSON.parse(savedData);
           td.html(this.getHtmlForData(savedData));
         }
+
+        let nbTdsToAddPrice = hasTxFee ? 2 : 1;
+        trElt.find("td").slice(-nbTdsToAddPrice).each((idx, elt) =>
+        {
+          let priceTd = $(elt);
+          if(priceTd.attr("data-usePrice"))
+          {
+            return;
+          }
+          let amountInEth = parseFloat(priceTd.text().replace("Ether", ""));
+          let priceInUSD = (amountInEth * ethUSDPrice).toFixed(2);
+          let usdPriceElt = $(`<div class="usdPrice">($${priceInUSD})</div>`);
+          priceTd.append(usdPriceElt);
+          priceTd.attr("data-usePrice", "1");
+        });
 
 
       }
@@ -345,17 +362,17 @@ class Main {
 
     if (location.pathname === "/txs")//Page that lists ALL transactions for an account
     {
-      htmlHelper.addDetailsToTable($('#ContentPlaceHolder1_mainrow  table'));
+      htmlHelper.addDetailsToTable($('#ContentPlaceHolder1_mainrow  table'), true);
     }
-    else if (mainAdress.length) //Accuont page
+    else if (mainAdress.length) //Account page
     {
       if (location.hash === "#internaltx")//Internal transactions Tab
       {
-        htmlHelper.addDetailsToTable($('#internaltx table'));
+        htmlHelper.addDetailsToTable($('#internaltx table'), false);
       }
       else if (location.hash === "")//Transactions for normal account
       {
-        htmlHelper.addDetailsToTable($('#transactions table'));
+        htmlHelper.addDetailsToTable($('#transactions table'), true);
       }
     }
   }
@@ -369,6 +386,12 @@ $(document).ready(() =>
   console.log('Etherscan CK Extension loaded');
   $("head").append(styles);
   let main = new Main();
-  main.doCheckUrlLoop();
+
+  $.getJSON("https://api.coinmarketcap.com/v1/ticker/ethereum/", data =>
+  {
+    ethUSDPrice = parseFloat(data[0].price_usd);
+    main.doCheckUrlLoop();
+  });
+
 })
 ;

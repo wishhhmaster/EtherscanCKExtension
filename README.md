@@ -36,3 +36,14 @@ Once you've navigated to a transaction details page, the transaction info will a
 
 
 If you find this extension useful, donations or kitties are welcome at this address: 0x589871abf6f300f0bcc574e5b6e554e64031a384
+
+## Changelog ##
+
+#### Version 0.3 - 2017-12-22 ####
+
+  * Added USD price on lists (Value retrieved from coinmarketcap)
+  * Fixed bug which added "Extra" column multiple times
+
+#### Version 0.2 - 2017-12-19 ####
+
+Initial commit
