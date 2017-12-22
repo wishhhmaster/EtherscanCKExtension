@@ -1,5 +1,6 @@
 # Etherscan CK Extension #
 
+
 ![alt text](table.png "Transaction list page")
 
 ## Description ##
@@ -29,10 +30,14 @@ Navigate to your address page on etherscan.io
 
 Click on a transaction to see its details, or navigate to the Internal Transactions tab and click on the parent's transaction link.
 This will open up a transactions details page, and display on top the action (bid/sale,...) and the kitties involved.
+
+
 ![alt text](table.png "Transaction details page")
 
+
+
 Once you've navigated to a transaction details page, the transaction info will also appear on the table.
-![alt text](table.png "Transaction list page")
+![alt text](details.png "Transaction list page")
 
 
 If you find this extension useful, donations or kitties are welcome at this address: 0x589871abf6f300f0bcc574e5b6e554e64031a384
